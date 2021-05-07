@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
@@ -24,7 +25,6 @@ public class Controller implements ActionListener{
 	}
 	
 	
-	
 	public boolean createVideogame() throws SQLException {
 		int idvideojuego = Integer.parseInt(JOptionPane.showInputDialog("Ingrese El id Del Videojuego"));
 		String name = JOptionPane.showInputDialog("Ingrese El nombre Del Videojuego");
@@ -41,8 +41,14 @@ public class Controller implements ActionListener{
 		switch (Events.valueOf(e.getActionCommand())) {
 			case LOGIN:
 			try {
+			
 				char[] comparepasswordfield = login.getPassword().getPassword();
 				connectionDataBase.Login(login.getField().getText(),comparepasswordfield);
+				  List<String> regions = connectionDataBase.getRegions();
+		            regions.forEach((String reg)->{
+		                System.out.println(reg);
+
+		            });
 				login.dispatchEvent(new WindowEvent(login, WindowEvent.WINDOW_CLOSING));
 				JOptionPane.showMessageDialog(null,"Login Correcto");
 				new FrameSelection(this);
