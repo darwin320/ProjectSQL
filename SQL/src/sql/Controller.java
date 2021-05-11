@@ -13,6 +13,7 @@ import view.Events;
 import view.FrameCrud;
 import view.FrameSelection;
 import view.Login;
+import view.PanelSelectItem;
 
 public class Controller implements ActionListener{
 
@@ -36,6 +37,21 @@ public class Controller implements ActionListener{
 		return connectionDataBase.insertVideogame(idvideojuego, name, sipnosis, fecha_lanzamiento, precio, infoJuego, requisistos);
 	}
 	
+	
+	
+	
+	public List<String> listVideoGames(){
+		List<String> regions = null;
+		 try {
+	            regions = connectionDataBase.getVideoGames();
+	            regions.forEach((String reg)->{
+	            });
+	        } catch (SQLException e) {
+	        	System.err.println(e);
+	        }
+		 return regions;
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		switch (Events.valueOf(e.getActionCommand())) {
@@ -44,11 +60,6 @@ public class Controller implements ActionListener{
 			
 				char[] comparepasswordfield = login.getPassword().getPassword();
 				connectionDataBase.Login(login.getField().getText(),comparepasswordfield);
-				  List<String> regions = connectionDataBase.getRegions();
-		            regions.forEach((String reg)->{
-		                System.out.println(reg);
-
-		            });
 				login.dispatchEvent(new WindowEvent(login, WindowEvent.WINDOW_CLOSING));
 				JOptionPane.showMessageDialog(null,"Login Correcto");
 				new FrameSelection(this);
@@ -71,12 +82,60 @@ public class Controller implements ActionListener{
 			new FrameCrud(this);
 			break;
 		case DELETE:
+			PanelSelectItem itemToDelete = new  PanelSelectItem(listVideoGames(),"Eliminar",false);
+			itemToDelete.getButton().addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+						try {
+							String  id = (String) itemToDelete.getComboBox().getSelectedItem();
+							int value =connectionDataBase.deleteVideogame(Integer.parseInt(id.replaceAll(" .*", "")));
+							if (value==1) {
+								JOptionPane.showMessageDialog(null,"Videojuego eliminado correctamente");
+							}
+						} catch (SQLException e1) {
+							System.err.println(e1);
+						}
+				}
+			} );
 			break;
 		case REPORTS:
 			break;
 		case SEARCH:
+			PanelSelectItem item = new  PanelSelectItem(listVideoGames(),"Buscar",false);
+			item.getButton().addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					int index = item.getComboBox().getSelectedIndex();
+						try {
+							String  id = (String) item.getComboBox().getSelectedItem();
+							connectionDataBase.getVideoGamesInfo(Integer.parseInt(id.replaceAll(" .*", "")));
+						} catch (SQLException e1) {
+							System.err.println(e1);
+						}
+				}
+			} );
+			
 			break;
 		case UPDATE:
+			PanelSelectItem value = new  PanelSelectItem(listVideoGames(),"Actualizar",true);
+			value.getButton().addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+						try {
+							String  id = (String) value.getComboBox().getSelectedItem();
+							String name = JOptionPane.showInputDialog("Ingrese el nuevo  "+value.getComboAux().getSelectedItem() + " Del Videojuego");
+							int result= connectionDataBase.UpdateVideogame(Integer.parseInt(id.replaceAll(" .*", ""))
+									, (String) value.getComboAux().getSelectedItem(), name);
+							
+							if (result ==1) {
+								JOptionPane.showMessageDialog(null,"Actualizacion satisfactoria");
+							}
+						} catch (SQLException e1) {
+							System.err.println(e1);
+						}
+				}
+			} );
+			
 			break;
 		default:
 			break;

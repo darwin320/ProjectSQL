@@ -4,6 +4,8 @@ import java.sql.*;
 import java.util.List;
 import java.util.Vector;
 
+import view.ShowResultSearch;
+
 public class ConnectionDataBase {
 
 	private Connection connection;
@@ -15,18 +17,47 @@ public class ConnectionDataBase {
 	}
 	
 	
+	
     private ResultSet select(String query) throws SQLException {
         ResultSet resultSet = this.statement.executeQuery(query);
         return  resultSet;
     }
+    
+    
+    public String ReportOne() throws SQLException {
+        String result = "";
+        ResultSet resultSet = this.select("SELECT *FROM videojuegos");
+        while (resultSet.next()){
+        	result+= resultSet.getInt("id_videojuego") + " " + resultSet.getString("nombre_juego");
+        }
+        return result;
+    }
+  
 
-    public List<String> getRegions() throws SQLException {
+    public List<String> getVideoGames() throws SQLException {
         List<String> regions = new Vector<>();
         ResultSet resultSet = this.select("SELECT *FROM videojuegos");
         while (resultSet.next()){
             regions.add(resultSet.getInt("id_videojuego") + "  "+resultSet.getString("nombre_juego"));
         }
         return regions;
+    }
+    
+    public int deleteVideogame(int videoGame) throws SQLException {
+    	int deleteRow = this.statement.executeUpdate(String.format("DELETE FROM videojuegos WHERE id_videojuego = %d ",videoGame));
+    	return deleteRow;
+    }
+    
+    public int getVideoGamesInfo(int idVideogame) throws SQLException {
+        ResultSet resultSet = this.select(String.format("SELECT *FROM videojuegos WHERE id_videojuego=%d",idVideogame));
+        while (resultSet.next()){
+        	 new ShowResultSearch(idVideogame, resultSet.getString("nombre_juego"), resultSet.getString("sinopsis"),
+             		resultSet.getDate("fecha_lanzamiento"), resultSet.getDouble("precio"), resultSet.getString("info_juego"),
+             		resultSet.getString("requisitos"));
+        }
+        
+        return idVideogame;
+       
     }
 
 	public boolean insertVideogame(int idvideojuego, String name, String sipnosis, String fecha_lanzamiento,
@@ -45,6 +76,27 @@ public class ConnectionDataBase {
 				+ String.valueOf(comparepasswordfield));
 		this.statement = this.connection.createStatement();
 		this.statement.setQueryTimeout(15);
+	}
+	
+	
+	public int UpdateVideogame(int id_videogame,String itemSelect,String value) throws SQLException {
+		int rowSelected = 0;
+		if (itemSelect.equals("id_videojuego")) {
+			rowSelected = this.statement.executeUpdate(String.format("UPDATE videojuegos SET %1$s = %2$d WHERE id_videojuego=%3$d "
+			, itemSelect,Integer.parseInt(value),id_videogame));
+		}else if(itemSelect.equals("precio")) {
+			rowSelected = this.statement.executeUpdate(String.format("UPDATE videojuegos SET %1$s = %2$f WHERE id_videojuego=%3$d "
+			, itemSelect,Double.parseDouble(value),id_videogame));
+		}else {
+//			System.out.println(String.format("UPDATE videojuegos SET %1$s = '%2$s' WHERE id_videojuego=%3$d "
+//					, itemSelect,value,id_videogame));
+
+			rowSelected = this.statement.executeUpdate(String.format("UPDATE videojuegos SET %1$s = '%2$s' WHERE id_videojuego=%3$d "
+			, itemSelect,value,id_videogame));
+		}
+		
+		return rowSelected;
+		 
 	}
 
 	public Connection getConnection() {
