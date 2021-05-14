@@ -26,12 +26,30 @@ public class ConnectionDataBase {
     
     public String ReportOne() throws SQLException {
         String result = "";
-        ResultSet resultSet = this.select("SELECT *FROM videojuegos");
+        ResultSet resultSet = this.select("SELECT v.id_videojuego,nombre_juego,COUNT(v.id_videojuego) AS logrosNumber\r\n"
+        		+ "FROM videojuegos v\r\n"
+        		+ "INNER JOIN logros l ON v.id_videojuego = l.id_videojuego\r\n"
+        		+ "GROUP BY v.id_videojuego\r\n"
+        		+ "ORDER BY logrosNumber DESC LIMIT 1\r\n"
+        		+ "");
         while (resultSet.next()){
-        	result+= resultSet.getInt("id_videojuego") + " " + resultSet.getString("nombre_juego");
+        	result+= "\n ID: " +  resultSet.getInt("id_videojuego") + "\n Nombre:" + resultSet.getString("nombre_juego");
         }
         return result;
     }
+    
+    public String ReportTwo() throws SQLException {
+        String result = "";
+        ResultSet resultSet = this.select("SELECT v.id_videojuego,nombre_juego\r\n"
+        		+ "FROM videojuegos v\r\n"
+        		+ "INNER JOIN asignacion_idiomas a ON v.id_videojuego = a.id_videojuego\r\n"
+        		+ "INNER JOIN idiomas i ON a.ID_IDIOMA = i.ID_IDIOMA AND i.NOMBRE_IDIOMA = 'SPANISH'");
+        while (resultSet.next()){
+        	result+= "\n ID: " +  resultSet.getInt("id_videojuego") + "\n Nombre:" + resultSet.getString("nombre_juego");
+        }
+        return result;
+    }
+    
   
 
     public List<String> getVideoGames() throws SQLException {

@@ -1,5 +1,6 @@
 package sql;
 
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -14,6 +15,7 @@ import view.FrameCrud;
 import view.FrameSelection;
 import view.Login;
 import view.PanelSelectItem;
+import view.ReportsSelection;
 
 public class Controller implements ActionListener{
 
@@ -99,6 +101,37 @@ public class Controller implements ActionListener{
 			} );
 			break;
 		case REPORTS:
+			ReportsSelection reportsSelection = new ReportsSelection();
+			reportsSelection.getReportOne().addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						JOptionPane.showMessageDialog(null, "EL VIDEOJUEGO CON EL MAYOR NUMERO DE LOGROS ES : "
+								+connectionDataBase.ReportOne());
+					} catch (HeadlessException e1) {
+						e1.printStackTrace();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				}
+			});
+			reportsSelection.getReportTwo().addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						JOptionPane.showMessageDialog(null, "VIDEOJUEGOS CON DISPONIBILIDAD DEL IDIOMA ESPAÑOL  : "
+								+connectionDataBase.ReportTwo());
+					} catch (HeadlessException e1) {
+						e1.printStackTrace();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+					
+				}
+			});
+			
 			break;
 		case SEARCH:
 			PanelSelectItem item = new  PanelSelectItem(listVideoGames(),"Buscar",false);

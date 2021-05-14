@@ -44,6 +44,7 @@ public class Login extends JFrame{
 		jPanel.add(password);
 		jPanel.add(button);
 		this.add(jPanel);
+		this.setLocationRelativeTo(null);
 	}
 
 
